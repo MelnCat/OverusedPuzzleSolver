@@ -1,0 +1,10 @@
+.puzzleDescription {
+	margin-top: 0.25em;
+	padding: 1em 3em;
+	background-color: #eee;
+	display: flex;
+	justify-content: center;
+}
+.puzzleDescriptionContainer {
+	text-align: center;
+}

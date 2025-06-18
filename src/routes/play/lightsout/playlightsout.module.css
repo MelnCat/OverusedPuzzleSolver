@@ -1,0 +1,19 @@
+.gameContainer {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	gap: 1em;
+}
+.winScreen {
+	align-items: center;
+	background-color: #f7f7f7;
+	margin: 1.2em;
+	padding: 1.2em;
+	display: flex;
+	flex-direction: column;
+	h1 {
+		font-size: 3em;
+		margin: 0;
+	}
+}

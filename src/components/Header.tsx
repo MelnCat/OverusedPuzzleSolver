@@ -17,6 +17,9 @@ export default function Header() {
 				<div>
 					<Link to="/ice">Ice Puzzle</Link>
 				</div>
+				<div>
+					<Link to="/fillout">Fill Out</Link>
+				</div>
 			</nav>
 		</header>
 	);

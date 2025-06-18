@@ -4,6 +4,7 @@ import { useMemo, useRef, useState, type Dispatch, type SetStateAction } from "r
 import styles from "./ice.module.css";
 import { useEventListener } from "usehooks-ts";
 import { BoardEditor, type PuzzleSolution } from "@/components/BoardEditor";
+import { PuzzleDescription } from "@/components/PuzzleDescription";
 
 export const Route = createFileRoute("/ice/")({
 	component: App,
@@ -33,7 +34,7 @@ const solve = (board: string[][], edges: boolean): PuzzleSolution => {
 			let nextPos = [currPos[0] + dir[0], currPos[1] + dir[1]];
 			const seen = last.seen.slice(0);
 			seen.push(cache[last.current[0]][last.current[1]]);
-			while (cache[nextPos[0]]?.[nextPos[1]]?.tile === " ") {
+			while (cache[nextPos[0]]?.[nextPos[1]]?.tile === "I") {
 				currPos = nextPos;
 				nextPos = [nextPos[0] + dir[0], nextPos[1] + dir[1]];
 			}
@@ -51,9 +52,9 @@ const solve = (board: string[][], edges: boolean): PuzzleSolution => {
 
 function App() {
 	const [board, setBoard] = useState([
-		["W", " ", " ", "E"],
-		[" ", " ", "W", " "],
-		["S", " ", " ", " "],
+		["W", "I", "I", "E"],
+		["I", "I", "W", "I"],
+		["S", "I", "I", "W"],
 	]);
 	const [edges, setEdges] = useState(true);
 	const solution = useMemo(() => solve(board, edges), [board, edges]);
@@ -64,9 +65,13 @@ function App() {
 				board={board}
 				setBoard={setBoard}
 				solution={solution}
-				nodeTypes={{ primary: [" ", "W"], secondary: ["S", "E"] }}
+				nodeTypes={{ primary: ["I", "W"], secondary: ["S", "E"] }}
 				extraButtons={[{ name: `Edge Walls: ${edges ? "ON" : "OFF"}`, onClick: () => setEdges(x => !x), width: "8.4em" }]}
 			/>
+			<PuzzleDescription>
+				<div>Ice puzzles consist of a frictionless surface where the goal is to reach an endpoint from a starting point.</div>
+				<div>The lack of friction results in all movements continuing until stopping from a wall collision.</div>
+			</PuzzleDescription>
 		</main>
 	);
 }

@@ -1,32 +1,39 @@
-import { useRef, type Dispatch, type SetStateAction, type MouseEvent } from "react";
+import { useRef, type Dispatch, type SetStateAction, type MouseEvent, useState } from "react";
 import { useEventListener } from "usehooks-ts";
 import styles from "./BoardEditor.module.css";
 import type { ReactNode } from "@tanstack/react-router";
 
-export type NodeType = " " | "X" | "O" | "S" | "E" | "W" | "I";
-export type PuzzleSolution = { type: "error"; error: string } | { type: "path"; nodes: { i: number; j: number }[] } | { type: "mark"; nodes: { i: number; j: number }[] };
+export type NodeType = " " | "X" | "O" | "S" | "E" | "W" | "I" | "V";
+export type PuzzleSolution =
+	| { type: "error"; error: string }
+	| { type: "path"; nodes: { i: number; j: number }[] }
+	| { type: "mark"; nodes: { i: number; j: number; char?: string }[] };
 
 export const BoardGrid = ({
 	board,
 	onClick,
 	extraContents,
 	extraSiblings,
+	isHovered,
 }: {
 	board: string[][];
-	onClick: (i: number, j: number, y: string, b: number) => void;
+	onClick?: (i: number, j: number, y: string, b: number) => void;
 	extraContents?: { i: number; j: number; node: ReactNode }[];
 	extraSiblings?: { i: number; j: number; node: ReactNode }[];
+	isHovered?: (hoveredPos: [number, number], currentPos: [number, number]) => boolean;
 }) => {
-	const mouseDownRef = useRef<false | number>(false);
+	const [hovered, setHovered] = useState<[number, number] | null>(null);
+	const [mouseDown, setMouseDown] = useState<false | number>(false);
 	useEventListener("mouseup", () => {
-		mouseDownRef.current = false;
+		setMouseDown(false);
 	});
+	const size = Math.max(board.length, board[0].length);
 	return (
 		<div
 			className={styles.boardGrid}
-			style={{ "--rows": board[0].length }}
+			style={{ "--rows": board[0].length, "--font-size-scale": size > 6 ? 0.9 : 1 }}
 			onMouseDown={e => {
-				mouseDownRef.current = e.button;
+				setMouseDown(e.button);
 			}}
 		>
 			{board.flatMap((x, i) =>
@@ -35,14 +42,19 @@ export const BoardGrid = ({
 						<div
 							className={styles.boardGridItem}
 							onMouseDown={e => {
-								onClick(i, j, y, e.button);
+								onClick?.(i, j, y, e.button);
 							}}
 							onContextMenu={e => {
 								e.preventDefault();
 							}}
 							onMouseEnter={e => {
-								if (mouseDownRef.current !== false) onClick(i, j, y, mouseDownRef.current);
+								if (mouseDown !== false) onClick?.(i, j, y, mouseDown);
+								setHovered([i, j]);
 							}}
+							onMouseLeave={e => {
+								setHovered(null);
+							}}
+							{...(hovered && isHovered?.(hovered, [i, j]) && { "data-hover": true, ...(mouseDown !== false && { "data-active": true }) })}
 							style={{ gridRow: i + 1, gridColumn: j + 1 }}
 							data-state={
 								{
@@ -53,6 +65,7 @@ export const BoardGrid = ({
 									X: "off",
 									O: "on",
 									E: "end",
+									V: "half-on",
 								}[y]
 							}
 						>
@@ -109,7 +122,7 @@ export const BoardEditor = ({
 							z.with(i, z[i].with(j, nodeTypes.secondary![(nodeTypes.secondary!.indexOf(y as NodeType) + 1) % nodeTypes.secondary!.length] ?? nodeTypes.primary[0]))
 						);
 				}}
-				extraContents={solution.type === "mark" ? solution.nodes.map(x => ({ i: x.i, j: x.j, node: <div>X</div> })) : []}
+				extraContents={solution.type === "mark" ? solution.nodes.map(x => ({ i: x.i, j: x.j, node: <div>{x.char ?? "X"}</div> })) : []}
 				extraSiblings={
 					solution.type === "path"
 						? solution.nodes.map(({ i, j }) => {
@@ -142,7 +155,7 @@ export const BoardEditor = ({
 						: []
 				}
 			/>
-			{solution.type === "error" && <div className={styles.noSolution}>{solution.error}</div>}
+			<div className={styles.noSolution}>{solution.type === "error" && solution.error}</div>
 		</section>
 	);
 };
