@@ -1,17 +1,21 @@
 import { Link } from "@tanstack/react-router";
+import styles from "./Header.module.css";
 
 export default function Header() {
 	return (
-		<header>
-			<nav>
-				<div>
+		<header className={styles.header}>
+			<nav className={styles.nav}>
+				<b>
 					Overused Puzzle Solver
-				</div>
+				</b>
 				<div>
 					<Link to="/">Home</Link>
 				</div>
 				<div>
 					<Link to="/lightsout">Lights Out</Link>
+				</div>
+				<div>
+					<Link to="/ice">Ice Puzzle</Link>
 				</div>
 			</nav>
 		</header>

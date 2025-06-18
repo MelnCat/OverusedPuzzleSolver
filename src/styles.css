@@ -37,8 +37,3 @@ button {
 		background-color: #cccccc;
 	}
 }
-
-nav {
-	display: flex;
-	gap: 1em;
-}

@@ -1,0 +1,7 @@
+.header {
+	padding: 1em;
+}
+.nav {
+	display: flex;
+	gap: 2em;
+}
