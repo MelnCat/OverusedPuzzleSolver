@@ -1,0 +1,63 @@
+.board {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.5em;
+}
+.boardGrid {
+	display: grid;
+	gap: 0.15em;
+	grid-template-columns: repeat(var(--rows), 1fr);
+	width: fit-content;
+	font-size: 3em;
+	user-select: none;
+}
+.boardButtons {
+	display: flex;
+	gap: 1em;
+}
+.boardGridItem {
+	aspect-ratio: 1 / 1;
+	width: 2em;
+	border-radius: 0.2em;
+	transition: all 0.2s;
+	transition-property: transform, background-color, border-color;
+	border-color: transparent;
+	background-color: transparent;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	text-align: center;
+	font-weight: bold;
+	div {
+		font-size: 0.5em;
+		pointer-events: none;
+		color: #ffffff;
+	}
+	&:hover {
+		transform: scale(1.05);
+	}
+	&:active {
+		transform: scale(0.95);
+	}
+	&[data-state="ground"] {
+		background-color: #e3eef1;
+	}
+	&[data-state="wall"] {
+		background-color: #9f9f9f;
+	}
+	&[data-state="start"] {
+		background-color: #70e758;
+	}
+	&[data-state="end"] {
+		background-color: #ff9595;
+	}
+}
+
+.noSolution {
+	font-size: 3em;
+	text-align: center;
+	font-weight: bold;
+	color: #f0aaaa;
+	margin: 0.2em 0;
+}

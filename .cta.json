@@ -1,0 +1,11 @@
+{
+	"projectName": "overusedpuzzlesolver",
+	"mode": "file-router",
+	"typescript": true,
+	"tailwind": false,
+	"packageManager": "yarn",
+	"git": true,
+	"version": 1,
+	"framework": "react-cra",
+	"chosenAddOns": ["eslint"]
+}
