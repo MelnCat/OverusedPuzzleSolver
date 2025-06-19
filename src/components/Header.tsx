@@ -20,6 +20,9 @@ export default function Header() {
 				<div>
 					<Link to="/fillout">Fill Out</Link>
 				</div>
+				<div>
+					<Link to="/play/lightsout">Play Lights Out!</Link>
+				</div>
 			</nav>
 		</header>
 	);

@@ -3,8 +3,10 @@ import { Matrix, inverse } from "ml-matrix";
 import { useMemo, useRef, useState, type Dispatch, type SetStateAction } from "react";
 import styles from "./lightsout.module.css";
 import { useEventListener } from "usehooks-ts";
-import { BoardEditor, BoardGrid, type PuzzleSolution } from "@/components/BoardEditor";
+import { BoardEditor, BoardGrid, type ErrorPuzzleSolution, type MarkPuzzleSolution, type PuzzleSolution } from "@/components/BoardEditor";
 import { PuzzleDescription } from "@/components/PuzzleDescription";
+import { gfMatrixGaussian } from "@/util/math";
+import { lightsOutModes, lightsOutTiles, type LightsOutMode } from "../play/lightsout";
 
 export const Route = createFileRoute("/lightsout/")({
 	component: App,
@@ -15,7 +17,15 @@ interface Coord {
 	y: string;
 	j: number;
 }
-export const solveLightsOut = (board: string[][], invert: boolean): PuzzleSolution => {
+export const solveLightsOut = (board: string[][], invert: boolean, mode: LightsOutMode): MarkPuzzleSolution | ErrorPuzzleSolution => {
+	const gf = {
+		regular: 2,
+		triple: 3,
+		quadruple: 4,
+		quintuple: 5,
+		septuple: 7,
+		nonuple: 9
+	}[mode];
 	const coords = board.flatMap((x, i) => x.flatMap((y, j) => (y === " " ? [] : { i, j, y })));
 	const cache: Record<number, Record<number, Coord>> = {};
 	for (const c of coords) {
@@ -23,26 +33,13 @@ export const solveLightsOut = (board: string[][], invert: boolean): PuzzleSoluti
 		cache[c.i][c.j] = c;
 	}
 	const matrix = new Matrix(coords.map(x => coords.map(y => (x === y || (Math.abs(x.i - y.i) === 1 && x.j === y.j) || (Math.abs(x.j - y.j) === 1 && x.i === y.i) ? 1 : 0))));
-	const initial = Matrix.columnVector(coords.map(x => (x.y === "X" ? 0 : 1)).map(x => (invert ? 1 - x : x)));
+	const initial = Matrix.columnVector(coords.map(x => lightsOutTiles[mode].indexOf(x.y as "X")).map(x => (invert ? x : gf - 1 - x)));
 	const augmented = matrix.clone().addColumn(initial);
-	const n = coords.length;
-	for (let i = 0; i < n; i++) {
-		let pivot = i;
-		while (pivot < n && augmented.get(pivot, i) === 0) pivot++;
-		if (pivot === n) continue;
-		if (pivot !== i) augmented.swapRows(pivot, i);
-
-		for (let j = 0; j < n; j++) {
-			if (j !== i && augmented.get(j, i) === 1) {
-				for (let k = i; k <= n; k++) {
-					augmented.set(j, k, augmented.get(j, k) ^ augmented.get(i, k));
-				}
-			}
-		}
-	}
-	if (augmented.to2DArray().some(x => x.slice(0, -1).every(y => y === 0) && x.at(-1) !== 0)) return { type: "error", error: "NO SOLUTION" };
-	const solution = augmented.getColumn(n);
-	return { type: "mark", nodes: coords.map((x, i) => ({ ...x, solution: solution[i] })).filter(x => x.solution === 1) };
+	const echelon = gfMatrixGaussian(augmented, gf);
+	if (!echelon || echelon.to2DArray().some(x => x.slice(0, -1).every(y => y === 0) && x.at(-1) !== 0)) return { type: "error", error: "NO SOLUTION" };
+	const solution = echelon.getColumn(coords.length);
+	const useNumbers = solution.some(x => x > 4);
+	return { type: "mark", nodes: coords.map((x, i) => ({ ...x, solution: solution[i], char: useNumbers ? solution[i].toString() : "X".repeat(solution[i]) })).filter(x => x.solution >= 1) };
 };
 
 function App() {
@@ -51,8 +48,9 @@ function App() {
 		["O", "O", "O"],
 		["O", "O", "O"],
 	]);
+	const [mode, setMode] = useState<LightsOutMode>("regular");
 	const [invert, setInvert] = useState(false);
-	const solution = useMemo(() => solveLightsOut(board, invert), [board, invert]);
+	const solution = useMemo(() => solveLightsOut(board, invert, mode), [board, invert, mode]);
 	return (
 		<main>
 			<h1>Lights Out Solver</h1>
@@ -61,7 +59,7 @@ function App() {
 				setBoard={setBoard}
 				solution={solution}
 				nodeTypes={{
-					primary: ["O", "X"],
+					primary: lightsOutTiles[mode],
 					secondary: [" ", "O"],
 				}}
 				extraButtons={[
@@ -71,6 +69,15 @@ function App() {
 							setInvert(x => !x);
 						},
 						width: "7.6em",
+					},
+					{
+						name: `Mode: ${mode.toUpperCase()}`,
+						onClick: () => {
+							const newMode = lightsOutModes[(lightsOutModes.indexOf(mode) + 1) % lightsOutModes.length];
+							setMode(newMode);
+							setBoard(x => x.map(y => y.map(z => lightsOutTiles[newMode].includes(z as "X") || z === " " ? z : "X")))
+						},
+						width: "10em",
 					},
 				]}
 			/>

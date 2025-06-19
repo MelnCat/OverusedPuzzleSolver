@@ -1,13 +1,12 @@
 import { useRef, type Dispatch, type SetStateAction, type MouseEvent, useState } from "react";
 import { useEventListener } from "usehooks-ts";
-import styles from "./BoardEditor.module.css";
+import styles from "./BoardEditor.module.scss";
 import type { ReactNode } from "@tanstack/react-router";
 
-export type NodeType = " " | "X" | "O" | "S" | "E" | "W" | "I" | "V";
-export type PuzzleSolution =
-	| { type: "error"; error: string }
-	| { type: "path"; nodes: { i: number; j: number }[] }
-	| { type: "mark"; nodes: { i: number; j: number; char?: string }[] };
+export type PathPuzzleSolution = { type: "path"; nodes: { i: number; j: number }[] };
+export type ErrorPuzzleSolution = { type: "error"; error: string };
+export type MarkPuzzleSolution = { type: "mark"; nodes: { i: number; j: number; char?: string }[] };
+export type PuzzleSolution = ErrorPuzzleSolution | PathPuzzleSolution | MarkPuzzleSolution;
 
 export const BoardGrid = ({
 	board,
@@ -56,18 +55,7 @@ export const BoardGrid = ({
 							}}
 							{...(hovered && isHovered?.(hovered, [i, j]) && { "data-hover": true, ...(mouseDown !== false && { "data-active": true }) })}
 							style={{ gridRow: i + 1, gridColumn: j + 1 }}
-							data-state={
-								{
-									W: "wall",
-									S: "start",
-									" ": "empty",
-									I: "ice",
-									X: "off",
-									O: "on",
-									E: "end",
-									V: "half-on",
-								}[y]
-							}
+							data-state={y}
 						>
 							{{ S: "START", E: "END" }[y] && <div className={styles.smallContent}>{{ S: "START", E: "END" }[y]}</div>}
 							{extraContents?.find(x => x.i === i && x.j === j)?.node}
@@ -92,8 +80,8 @@ export const BoardEditor = ({
 	extraButtons?: { name: string; onClick: (e: MouseEvent) => void; width?: string }[];
 	solution: PuzzleSolution;
 	nodeTypes: {
-		primary: NodeType[];
-		secondary?: NodeType[];
+		primary: readonly string[];
+		secondary?: readonly string[];
 	};
 }) => {
 	return (
@@ -114,15 +102,23 @@ export const BoardEditor = ({
 				board={board}
 				onClick={(i, j, y, b) => {
 					if (b === 0 || !nodeTypes.secondary)
-						setBoard(z =>
-							z.with(i, z[i].with(j, nodeTypes.primary[(nodeTypes.primary.indexOf(y as NodeType) + 1) % nodeTypes.primary.length] ?? nodeTypes.primary[0]))
-						);
+						setBoard(z => z.with(i, z[i].with(j, nodeTypes.primary[(nodeTypes.primary.indexOf(y) + 1) % nodeTypes.primary.length] ?? nodeTypes.primary[0])));
 					if (b === 2)
-						setBoard(z =>
-							z.with(i, z[i].with(j, nodeTypes.secondary![(nodeTypes.secondary!.indexOf(y as NodeType) + 1) % nodeTypes.secondary!.length] ?? nodeTypes.primary[0]))
-						);
+						setBoard(z => z.with(i, z[i].with(j, nodeTypes.secondary![(nodeTypes.secondary!.indexOf(y) + 1) % nodeTypes.secondary!.length] ?? nodeTypes.primary[0])));
 				}}
-				extraContents={solution.type === "mark" ? solution.nodes.map(x => ({ i: x.i, j: x.j, node: <div>{x.char ?? "X"}</div> })) : []}
+				extraContents={
+					solution.type === "mark"
+						? solution.nodes.map(x => ({
+								i: x.i,
+								j: x.j,
+								node: (
+									<div className={styles.xMark} style={{ fontSize: (x.char?.length ?? 0) > 3 ? "0.65em" : (x.char?.length ?? 0) > 2 ? "0.75em" : "" }}>
+										{x.char ?? "X"}
+									</div>
+								),
+							}))
+						: []
+				}
 				extraSiblings={
 					solution.type === "path"
 						? solution.nodes.map(({ i, j }) => {
