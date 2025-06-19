@@ -8,6 +8,7 @@ function App() {
 	return (
 		<main>
 			<h1>Overused Puzzle Solver</h1>
+			<p style={{ textAlign: "center" }}>Use the navigation bar.</p>
 		</main>
 	);
 }

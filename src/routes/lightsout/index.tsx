@@ -1,11 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Matrix, inverse } from "ml-matrix";
-import { useMemo, useRef, useState, type Dispatch, type SetStateAction } from "react";
-import styles from "./lightsout.module.css";
-import { useEventListener } from "usehooks-ts";
-import { BoardEditor, BoardGrid, type ErrorPuzzleSolution, type MarkPuzzleSolution, type PuzzleSolution } from "@/components/BoardEditor";
+import { BoardEditor, type ErrorPuzzleSolution, type MarkPuzzleSolution } from "@/components/BoardEditor";
 import { PuzzleDescription } from "@/components/PuzzleDescription";
 import { gfMatrixGaussian } from "@/util/math";
+import { createFileRoute } from "@tanstack/react-router";
+import { Matrix } from "ml-matrix";
+import { useMemo, useState } from "react";
 import { lightsOutModes, lightsOutTiles, type LightsOutMode } from "../play/lightsout";
 
 export const Route = createFileRoute("/lightsout/")({

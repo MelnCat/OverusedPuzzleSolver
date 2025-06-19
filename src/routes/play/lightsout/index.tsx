@@ -1,8 +1,8 @@
 import { BoardGrid } from "@/components/BoardEditor";
-import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-import styles from "./playlightsout.module.css";
 import { solveLightsOut } from "@/routes/lightsout";
+import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
+import styles from "./playlightsout.module.css";
 export const Route = createFileRoute("/play/lightsout/")({
 	component: App,
 });

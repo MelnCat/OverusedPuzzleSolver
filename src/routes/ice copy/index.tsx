@@ -1,9 +1,8 @@
 import { BoardEditor, type PuzzleSolution } from "@/components/BoardEditor";
-import { PuzzleDescription } from "@/components/PuzzleDescription";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 
-export const Route = createFileRoute("/ice/")({
+export const Route = createFileRoute("/ice copy/")({
 	component: App,
 });
 
@@ -25,20 +24,20 @@ const solve = (board: string[][], edges: boolean): PuzzleSolution => {
 			[0, -1],
 			[1, 0],
 			[-1, 0],
-		];
+		]
 		for (const dir of dirs) {
 			let currPos = [last.current[0], last.current[1]];
 			let nextPos = [currPos[0] + dir[0], currPos[1] + dir[1]];
 			const seen = last.seen.slice(0);
 			seen.push(cache[last.current[0]][last.current[1]]);
-			while (cache[nextPos[0]]?.[nextPos[1]]?.tile === "I") {
+			while (cache[nextPos[0]]?.[nextPos[1]]?.tile === " ") {
 				currPos = nextPos;
 				nextPos = [nextPos[0] + dir[0], nextPos[1] + dir[1]];
 			}
 			const wall = (cache[nextPos[0]]?.[nextPos[1]] === undefined && edges) || cache[nextPos[0]]?.[nextPos[1]]?.tile === "W";
 			if (!wall) {
 				if (cache[nextPos[0]]?.[nextPos[1]]?.tile === "E") return { type: "path", nodes: seen.concat(cache[nextPos[0]][nextPos[1]]) };
-				continue;
+				continue
 			}
 			if (last.seen.includes(cache[currPos[0]][currPos[1]])) continue;
 			states.push({ current: currPos, seen });
@@ -49,9 +48,9 @@ const solve = (board: string[][], edges: boolean): PuzzleSolution => {
 
 function App() {
 	const [board, setBoard] = useState([
-		["W", "I", "I", "E"],
-		["I", "I", "W", "I"],
-		["S", "I", "I", "W"],
+		["W", " ", " ", "E"],
+		[" ", " ", "W", " "],
+		["S", " ", " ", " "],
 	]);
 	const [edges, setEdges] = useState(true);
 	const solution = useMemo(() => solve(board, edges), [board, edges]);
@@ -62,13 +61,9 @@ function App() {
 				board={board}
 				setBoard={setBoard}
 				solution={solution}
-				nodeTypes={{ primary: ["I", "W"], secondary: ["S", "E"] }}
+				nodeTypes={{ primary: [" ", "W"], secondary: ["S", "E"] }}
 				extraButtons={[{ name: `Edge Walls: ${edges ? "ON" : "OFF"}`, onClick: () => setEdges(x => !x), width: "8.4em" }]}
 			/>
-			<PuzzleDescription>
-				<div>Ice puzzles consist of a frictionless surface where the goal is to reach an endpoint from a starting point.</div>
-				<div>The lack of friction results in all movements continuing until stopping from a wall collision.</div>
-			</PuzzleDescription>
 		</main>
-	);
+	)
 }

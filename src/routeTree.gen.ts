@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LightsoutIndexRouteImport } from './routes/lightsout/index'
 import { Route as IceIndexRouteImport } from './routes/ice/index'
+import { Route as IcecopyIndexRouteImport } from './routes/ice copy/index'
 import { Route as FilloutIndexRouteImport } from './routes/fillout/index'
 import { Route as PlayLightsoutIndexRouteImport } from './routes/play/lightsout/index'
 
@@ -30,6 +31,11 @@ const IceIndexRoute = IceIndexRouteImport.update({
   path: '/ice/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const IcecopyIndexRoute = IcecopyIndexRouteImport.update({
+  id: '/ice copy/',
+  path: '/ice copy/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FilloutIndexRoute = FilloutIndexRouteImport.update({
   id: '/fillout/',
   path: '/fillout/',
@@ -44,6 +50,7 @@ const PlayLightsoutIndexRoute = PlayLightsoutIndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/fillout': typeof FilloutIndexRoute
+  '/ice copy': typeof IcecopyIndexRoute
   '/ice': typeof IceIndexRoute
   '/lightsout': typeof LightsoutIndexRoute
   '/play/lightsout': typeof PlayLightsoutIndexRoute
@@ -51,6 +58,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/fillout': typeof FilloutIndexRoute
+  '/ice copy': typeof IcecopyIndexRoute
   '/ice': typeof IceIndexRoute
   '/lightsout': typeof LightsoutIndexRoute
   '/play/lightsout': typeof PlayLightsoutIndexRoute
@@ -59,19 +67,27 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/fillout/': typeof FilloutIndexRoute
+  '/ice copy/': typeof IcecopyIndexRoute
   '/ice/': typeof IceIndexRoute
   '/lightsout/': typeof LightsoutIndexRoute
   '/play/lightsout/': typeof PlayLightsoutIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/fillout' | '/ice' | '/lightsout' | '/play/lightsout'
+  fullPaths:
+    | '/'
+    | '/fillout'
+    | '/ice copy'
+    | '/ice'
+    | '/lightsout'
+    | '/play/lightsout'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/fillout' | '/ice' | '/lightsout' | '/play/lightsout'
+  to: '/' | '/fillout' | '/ice copy' | '/ice' | '/lightsout' | '/play/lightsout'
   id:
     | '__root__'
     | '/'
     | '/fillout/'
+    | '/ice copy/'
     | '/ice/'
     | '/lightsout/'
     | '/play/lightsout/'
@@ -80,6 +96,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   FilloutIndexRoute: typeof FilloutIndexRoute
+  IcecopyIndexRoute: typeof IcecopyIndexRoute
   IceIndexRoute: typeof IceIndexRoute
   LightsoutIndexRoute: typeof LightsoutIndexRoute
   PlayLightsoutIndexRoute: typeof PlayLightsoutIndexRoute
@@ -108,6 +125,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IceIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ice copy/': {
+      id: '/ice copy/'
+      path: '/ice copy'
+      fullPath: '/ice copy'
+      preLoaderRoute: typeof IcecopyIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/fillout/': {
       id: '/fillout/'
       path: '/fillout'
@@ -128,6 +152,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   FilloutIndexRoute: FilloutIndexRoute,
+  IcecopyIndexRoute: IcecopyIndexRoute,
   IceIndexRoute: IceIndexRoute,
   LightsoutIndexRoute: LightsoutIndexRoute,
   PlayLightsoutIndexRoute: PlayLightsoutIndexRoute,

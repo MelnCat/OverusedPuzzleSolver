@@ -1,10 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Matrix, inverse } from "ml-matrix";
-import { useMemo, useRef, useState, type Dispatch, type SetStateAction } from "react";
-import styles from "./fillout.module.css";
-import { useEventListener } from "usehooks-ts";
 import { BoardEditor, type PuzzleSolution } from "@/components/BoardEditor";
 import { PuzzleDescription } from "@/components/PuzzleDescription";
+import { createFileRoute } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
 
 export const Route = createFileRoute("/fillout/")({
 	component: App,
